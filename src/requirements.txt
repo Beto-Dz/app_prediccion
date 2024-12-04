@@ -1,0 +1,8 @@
+Flask==2.3.3
+debugpy # Required for debugging
+scikit-learn==1.4.2
+pandas
+azure-storage-blob
+joblib
+flask
+python-dotenv

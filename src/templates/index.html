@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es-mx">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Predicción de causa de accidentes</title>
+  <style>
+    @import url("https://fonts.cdnfonts.com/css/xmas-sweater-stitch");
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      outline: none;
+      border: none;
+    }
+
+    html {
+      scrollbar-width: thin;
+      user-select: none;
+    }
+
+    body {
+      font-family: "Xmas Sweater Stitch", system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100dvh;
+      background-image: url("https://betomx.netlify.app/bkg.png");
+      background-repeat: repeat-y;
+      background-size: 100%;
+      overflow: hidden;
+    }
+
+    .icon {
+      color: rgba(255, 255, 255, 0.309);
+      position: absolute;
+      font-size: 6rem;
+      animation: anima 5s infinite ease-in-out alternate;
+
+      &:first-child {
+        animation-delay: 1s;
+      }
+
+      &:nth-child(2) {
+        animation-delay: 3s;
+      }
+
+      &:nth-child(3) {
+        animation-delay: 5s;
+      }
+
+      &:nth-child(4) {
+        animation-delay: 7s;
+      }
+
+      &:nth-child(5) {
+        animation-delay: 9s;
+      }
+    }
+
+    main {
+      width: clamp(300px, 80vw, 900px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      border-radius: 12px;
+      padding: 1rem;
+      background-image: linear-gradient(to top,
+          rgb(0, 198, 251, 0.2) 0%,
+          rgb(0, 91, 234, 0.2) 100%);
+    }
+
+    h3 {
+      text-align: center;
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      font-weight: normal;
+      color: #f85e00;
+      margin-top: 16px;
+    }
+
+    .title {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      text-align: center;
+      font-weight: normal;
+      color: #09f;
+      text-transform: capitalize;
+    }
+
+    form {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-rows: auto 1fr;
+      grid-auto-rows: auto;
+      gap: 1rem;
+      text-transform: capitalize;
+    }
+
+    .form__section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    label {
+      font-size: clamp(1.2rem, 2vw, 1.5rem);
+      margin-top: 10px;
+    }
+
+    select,
+    input,
+    button {
+      width: 100%;
+      margin-top: 5px;
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: Xmas Sweater Stitch;
+      font-size: clamp(0.5rem, 2vw, 1.1rem);
+      font-weight: normal;
+      background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    select {
+      text-transform: capitalize;
+
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: #00000088;
+        border-radius: 8px;
+      }
+    }
+
+    input::placeholder {
+      color: black;
+    }
+
+    button {
+      transition: all 0.1s ease-in-out;
+      cursor: pointer;
+      grid-column: 1 / -1;
+      width: 20%;
+      margin: 0 auto;
+      padding: 12px;
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      color: white;
+      background-color: rgb(0, 153, 255, 0.8);
+
+      &:hover {
+        transform: scale(1.1);
+        background-color: rgb(0, 153, 255);
+      }
+
+      &:active {
+        transform: scale(0.9);
+      }
+    }
+
+    input:focus,
+    select:focus {
+      outline: 5px solid #09f;
+    }
+
+    @keyframes anima {
+      0% {
+        transform: scale(1);
+        opacity: .8;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: .8;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <span class="icon" style="right: 6rem; top: 6rem; rotate: 13deg; color: rgb(76, 201, 240, .5);">%</span>
+  <span class="icon" style="right: 1rem; bottom: 1rem; rotate: -20deg; color: rgb(128, 237, 153, .5);">^</span>
+  <span class="icon" style="left: 12rem; top: 2rem; rotate: 5deg; color: rgba(153, 88, 42, 0.5);">«</span>
+  <span class="icon" style="left: 2rem; rotate: -10deg; color: black;">§</span>
+  <span class="icon" style="left: 30rem; bottom: 2rem; rotate: -5deg;color: rgb(255, 0, 0, .5); z-index:-300;">™</span>
+  <main>
+    <h1 class="title">Predicción de causa de accidentes automovilisticos en Xalapa, Veracruz.</h1>
+    <form action="/predict" method="post" id="formulario">
+      <section class="form__section">
+        <label for="dia_de_la_semana">Día de la semana</label>
+        <select name="dia_de_la_semana" id="dia_de_la_semana" required>
+          <option value="1">Lunes</option>
+          <option value="2">Martes</option>
+          <option value="3">Miércoles</option>
+          <option value="4">Jueves</option>
+          <option value="5">Viernes</option>
+          <option value="6">Sábado</option>
+          <option value="7">Domingo</option>
+        </select>
+
+        <label for="numero_de_avenida">Numero de avenida</label>
+        <select name="numero_de_avenida" id="numero_de_avenida" required>
+          <option value="2">2</option>
+          <option value="1">1</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="0">0</option>
+        </select>
+
+        <label for="colonia">Colonia</label>
+        <select name="colonia" id="colonia" required=>
+          <option value="736">CENTRO</option>
+          <option value="208">RAFAEL LUCIO</option>
+          <option value="171">ENCINAL</option>
+          <option value="137">ANIMAS</option>
+          <option value="119">OBRERO CAMPESINA</option>
+          <option value="81">PROGRESO MACUILTEPEC</option>
+          <option value="73">MARTIRES DE CHICAGO</option>
+          <option value="71">21 DE MARZO</option>
+          <option value="69">EMILIANO ZAPATA</option>
+          <option value="68">PROGRESO MACUILTEPETL</option>
+          <option value="63">CUAUHTEMOC</option>
+          <option value="63">JOSE CARDEL</option>
+          <option value="59">BADILLO</option>
+          <option value="57">REVOLUCION</option>
+          <option value="53">UNIDAD DEL BOSQUE</option>
+          <option value="49">BENITO JUAREZ</option>
+          <option value="46">CAROLINO ANAYA</option>
+          <option value="42">REPRESA DEL CARMEN</option>
+          <option value="42">FERRER GUARDIA</option>
+          <option value="37">SALUD</option>
+          <option value="36">AGUACATAL</option>
+          <option value="34">POMONA</option>
+          <option value="34">ZONA UNIVERSITARIA</option>
+          <option value="34">RESERVA TERRITORIAL</option>
+          <option value="33">FRANSCISCO I. MADERO</option>
+          <option value="33">TAMBORREL</option>
+          <option value="28">UNIDAD MAGISTERIAL</option>
+          <option value="28">FERROCARRILERA</option>
+          <option value="27">FRANCISCO I. MADERO</option>
+          <option value="25">FRANCISCO FERRER GUARDIA</option>
+          <option value="24">DEL MAESTRO</option>
+          <option value="23">EL MIRADOR</option>
+          <option value="23">LAURELES</option>
+          <option value="23">7 DE NOVIEMBRE</option>
+          <option value="23">MIRADOR</option>
+          <option value="21">LOMAS VERDES</option>
+          <option value="19">VERACRUZ</option>
+          <option value="19">FRACCIONAMIENTO VERACRUZ</option>
+          <option value="19">PASTORESA</option>
+          <option value="18">JARDINES DE XALAPA</option>
+          <option value="17">VENUSTIANO CARRANZA</option>
+          <option value="17">CASA BLANCA</option>
+          <option value="17">FRACCIONAMIENTO ENSUENO</option>
+          <option value="16">ALVARO OBREGON</option>
+          <option value="15">EL OLMO</option>
+          <option value="15">ARBOLEDAS DEL SUMIDERO</option>
+          <option value="15">AGUA SANTA 2</option>
+          <option value="15">PREDIO DE LA VIRGEN</option>
+          <option value="14">2 DE ABRIL</option>
+          <option value="13">LA LAGUNILLA</option>
+          <option value="13">AGUA SANTA</option>
+          <option value="13">LAS TRANCAS</option>
+          <option value="13">FEDERAL</option>
+          <option value="11">UNIDAD DEL VALLE</option>
+          <option value="11">SEBASTIAN LERDO DE TEJADA</option>
+          <option value="11">UNIDAD POMONA</option>
+          <option value="11">FRACCIONAMIENTO LOS ANGELES</option>
+          <option value="11">TATAHUICAPAN</option>
+        </select>
+
+        <label for="condiciones_naturales">Condiciones naturales</label>
+        <select name="condiciones_naturales" id="condiciones_naturales" required>
+          <option value="1">SOLEADO</option>
+          <option value="2">LLUVIA</option>
+          <option value="3">NIEBLA</option>
+          <option value="4">TOLVANERA</option>
+          <option value="5">GRANIZO</option>
+        </select>
+
+        <label for="restricciones_de_la_via">Restricciones de la via</label>
+        <select name="restricciones_de_la_via" id="restricciones_de_la_via" required>
+          <option value="1">SIN RESTRICCION</option>
+          <option value="2">ACCIDENTE PREVIO</option>
+          <option value="3">OBRA EN CONSTRUCCION</option>
+          <option value="4">DESVIACION PROVISIONAL</option>
+          <option value="5">HOYO/ZANJA</option>
+          <option value="6">OBJETO SOBRE CAMINO</option>
+          <option value="7">COLISION</option>
+        </select>
+
+        <label for="forma_de_accidentarse">Forma de accidentarse</label>
+        <select name="forma_de_accidentarse" id="forma_de_accidentarse" required>
+          <option value="1">ANGULO</option>
+          <option value="2">POR ALCANCE</option>
+          <option value="3">LATERAL</option>
+          <option value="4">MANIOBRA EN REVERSA</option>
+          <option value="5">DE FRENTE</option>
+          <option value="6">FALLA MECANICA</option>
+          <option value="7">OTRO</option>
+        </select>
+      </section>
+      <section class="form__section">
+        <label for="contra_que_fue_el_impacto">Contra que fue el impacto</label>
+        <select name="contra_que_fue_el_impacto" id="contra_que_fue_el_impacto" required>
+          <option value="1">VEHICULO CIRCULANDO</option>
+          <option value="2">OBJETO FIJO</option>
+          <option value="3">VEHICULO ESTACIONADO</option>
+          <option value="4">OTRO</option>
+        </select>
+
+        <label for="cantidad_de_vehiculos">Número de vehículos</label>
+        <input type="number" id="cantidad_de_vehiculos" name="cantidad_de_vehiculos" min="0" max="100" placeholder="#"
+          required>
+
+        <label for="danios_monto">Daños (Monto en MXN)</label>
+        <input type="number" id="danios_monto" name="danios_monto" min="0" max="1000000" placeholder="$$$" required>
+
+        <label for="numero_de_muertos">Número de muertos</label>
+        <input type="number" id="numero_de_muertos" name="numero_de_muertos" min="0" max="100" placeholder="#" required>
+
+        <label for="mes">Mes</label>
+        <select name="mes" id="mes" required=>
+          <option value="1">Enero</option>
+          <option value="2">Febrero</option>
+          <option value="3">Marzo</option>
+          <option value="4">Abril</option>
+          <option value="5">Mayo</option>
+          <option value="6">Junio</option>
+          <option value="7">Julio</option>
+          <option value="8">Agosto</option>
+          <option value="9">Septiembre</option>
+          <option value="10">Octubre</option>
+          <option value="11">Noviembre</option>
+          <option value="12">Diciembre</option>
+        </select>
+
+        <label for="dia_del_ano">Día del año</label>
+        <input type="number" id="dia_del_ano" name="dia_del_ano" min="1" max="365" placeholder="#" required>
+      </section>
+
+      <button type="submit">Predecir</button>
+    </form>
+    <h3 id="causa">Causa del accidente... </h3>
+  </main>
+
+  <script>
+    const form = document.querySelector('#formulario');
+    const causa = document.querySelector('#causa');
+
+    form.addEventListener('submit', async (e) => {
+      // Evitar que se recargue la página
+      e.preventDefault();
+
+      // Obtener los datos del formulario
+      const formData = new FormData(form);
+
+      const response = await fetch('/predict', {
+        method: 'POST',
+        body: formData
+      });
+
+      const { prediction } = await response.json();
+
+      console.log(prediction)
+
+      causa.innerText = (prediction) ? `Causa del accidente: ${prediction}` : 'Error....';
+    });
+  </script>
+</body>
+
+</html>
