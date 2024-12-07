@@ -8,4 +8,4 @@ Primera vista del formulario
 ![formulario](./img/form.png)
 
 Resultado, donde se muestra la prediccion obtenida del modelo
-![resultado](./img/result.png)
+![resultado](./img/image.png)
